@@ -4,7 +4,6 @@ import { fetchComments, postComment } from '../dbModels/comments.js'
 import { ModalContainer, ModalDialog } from 'react-modal-dialog';
 import { fetchAllArticles, fetchAllSources, fetchVoice } from '../models/articles.js';
 import UserControls from './UserControls.js';
-import Watson from 'watson-developer-cloud'
 import Sentiment from 'sentiment';
 import RC from 'rc-progress';
 

@@ -10,16 +10,11 @@ var Comments       = require('./comments')
 
 var app = express();
 
-app.use(express.static(path.join(__dirname, "../client/public")));
+app.use(express.static(path.join(__dirname, "../public")));
 app.use('/soundcloud', express.static(path.join(__dirname, "../soundcloud/")));
-app.use(express.static(path.join(__dirname, '../bower_components/csshake')));
 app.use(bodyParser.json());
 
 app.get('/app-bundle.js',
-  (req, res, next ) => {
-    res.header({ 'Content-Length': 26184090 })
-    next()
-  },
   browserify('./client/main.js', {
     transform: [ [ require('babelify'), { presets: ["es2015", "react"] } ] ]
   })
