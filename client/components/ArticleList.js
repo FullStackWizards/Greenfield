@@ -11,8 +11,6 @@ import RC from 'rc-progress';
 
 var ProgressBar = RC.Line
 var waitingForSpeech = false;
-var audio = new Audio('textToSpeech.wav');
-
 
 export default class ArticleList extends React.Component {
   constructor(props) {
@@ -23,7 +21,6 @@ export default class ArticleList extends React.Component {
       progressPercent: 0,
       mood: 'good'
     };
-    var audio = new Audio('textToSpeech.wav');
   }
   onlyUnique(value, index, self) {
     return self.indexOf(value) === index;
@@ -94,65 +91,67 @@ export default class ArticleList extends React.Component {
     return uniqueArticles;
   }
   getSources() {
+    const sourcesConfig = {
+      'ars-technica': true,
+      'associated-press': true,
+      'bbc-news': true,
+      'bbc-sport': true,
+      'bild': true,
+      'bloomberg': true,
+      'buzzfeed': true,
+      'cnbc': true,
+      'cnn': true,
+      'daily-mail': true,
+      'engadget': true,
+      'entertainment-weekly': true,
+      'espn': true,
+      'espn-cric-info': true,
+      'financial-times': true,
+      'focus': true,
+      'fox-sports': true,
+      'google-news': true,
+      'hacker-news': true,
+      'ign': true,
+      'independent': true,
+      'mashable': true,
+      'metro': true,
+      'mirror': true,
+      'new-scientist': true,
+      'nfl-news': true,
+      'polygon': true,
+      'recode': true,
+      'reddit-r-all': true,
+      'reuters': true,
+      'sky-news': true,
+      'sky-sports-news': true,
+      'spiegel-online': true,
+      'talk-sport': true,
+      'tech-crunch': true,
+      'tech-radar': true,
+      'the-guardian-uk': true,
+      'the-hindu': true,
+      'the-huffington-post': true,
+      'the-new-york-times': true,
+      'the-next-web': true,
+      'the-telegraph': true,
+      'the-times-of-india': true,
+      'the-verge': true,
+      'the-wallstreet-journal': true,
+      'the-washington-post': true,
+      'time': true,
+    }
     fetchAllSources()
-    .then(source => {
-      let sources = [];
-      source.forEach(source => {
-        let sourcesToFilter = [
-          'ars-technica',
-          'associated-press',
-          'bbc-news',
-          'bbc-sport',
-          'bild',
-          'bloomberg',
-          'buzzfeed',
-          'cnbc',
-          'cnn',
-          'daily-mail',
-          'engadget',
-          'entertainment-weekly',
-          'espn',
-          'espn-cric-info',
-          'financial-times',
-          'focus',
-          'fox-sports',
-          'google-news',
-          'hacker-news',
-          'ign',
-          'independent',
-          'mashable',
-          'metro',
-          'mirror',
-          'new-scientist',
-          'nfl-news',
-          'polygon',
-          'recode',
-          'reddit-r-all',
-          'reuters',
-          'sky-news',
-          'sky-sports-news',
-          'spiegel-online',
-          'talk-sport',
-          'tech-crunch',
-          'tech-radar',
-          'the-guardian-uk',
-          'the-hindu',
-          'the-huffington-post',
-          'the-new-york-times',
-          'the-next-web',
-          'the-telegraph',
-          'the-times-of-india',
-          'the-verge',
-          'the-wallstreet-journal',
-          'the-washington-post',
-          'time',
-        ]
+    .then(sources => {
+      let filteredSources = [];
+      console.log(sources[0])
+      sources.forEach(source => {
 
-        if(sourcesToFilter.indexOf(source.id) !== -1) {
-          sources.push(source);
+
+        if(sourcesConfig[source.id]) {
+          filteredSources.push(source);
         }
       })
-      this.getArticles(sources)
+      this.getArticles(filteredSources)
     })
   }
   openComments(title) {
@@ -173,15 +172,21 @@ export default class ArticleList extends React.Component {
   closeComments() {
     this.setState({showComments: false})
   }
-  textToSpeech(words) {
+  textToSpeech(article) {
+    var title = article.title.split(' ')
+
+    article.id = [title[0], title[1]].join('')
+    console.log('the article: ', article)
     if(!waitingForSpeech){
       document.body.style.cursor = 'wait';
       waitingForSpeech = true;
-      fetchVoice(words).then(something => {
+      fetchVoice(article).then(something => {
+        var audio = new Audio(`${article.id}.wav`);
+        console.log('audio: ', audio)
         audio.load();
         document.body.style.cursor = 'default';
-        waitingForSpeech = false;
         audio.play();
+        waitingForSpeech = false;
       })
     }
   }
@@ -203,13 +208,26 @@ export default class ArticleList extends React.Component {
           <div>
             <img className="article" src={article.urlToImage} />
             <aside className="photo-box-caption">
+            <img onClick={() => this.textToSpeech(article)}
+              onTouchStart={() => this.textToSpeech(article)}
+              className="source-image"
+              src={"http://img.freepik.com/free-icon/play-button_318-43248.jpg?size=338&ext=jpg"}
+              onMouseOver={e => e.target.src="/img/sound-recording.png"}
+              onMouseLeave={e => e.target.src="http://img.freepik.com/free-icon/play-button_318-43248.jpg?size=338&ext=jpg"}
+            />
               <p>{article.title}</p>
-              <button type="button" className="button-xsmall pure-button" onClick={(e) =>{
-                e.preventDefault()
-                this.redirectToArticle(article.url)}} target="_blank">Full article</button>
-              <button type="button" className="button-xsmall pure-button" onClick={(e) => {
-                e.preventDefault()
-                this.openComments(article.title)}}>Comments!</button>
+              <button type="button"
+                className="button-xsmall pure-button"
+                onClick={
+                  (e) => {
+                    e.preventDefault()
+                    this.redirectToArticle(article.url)
+                  }
+                }
+                target="_blank"
+              >
+                Full article
+              </button>
             </aside>
           </div>
         </div>
@@ -261,7 +279,6 @@ class Comments extends React.Component {
     if (username && msg) {
       postComment(title, username, msg)
       .then(resp => {
-        console.log('yay we added a comment... resp: ', resp)
         this.setState({
           username: '',
           msg: ''
@@ -272,7 +289,6 @@ class Comments extends React.Component {
   }
 
   componentDidMount(){
-    console.log('live comments woo woo!!!')
     setInterval(this.props.updateComments, 500);
   }
 

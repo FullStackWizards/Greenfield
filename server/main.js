@@ -1,11 +1,11 @@
 "use strict"
+require('dotenv').config()
 var express        = require('express');
 var path           = require('path');
 var browserify     = require('browserify-middleware');
 var bodyParser     = require('body-parser');
 var watson = require('watson-developer-cloud');
 var fs             = require('fs');
-var credentials    = require('./watsonCredentials')
 var Comments       = require('./comments')
 
 var app = express();
@@ -57,19 +57,21 @@ app.post('/comments', function(req, res) {
 
 app.post('/textToSpeech', function(req, res) {
   var text_to_speech = watson.text_to_speech({
-    username: credentials.username,
-    password: credentials.password,
+    username: process.env.WATSON_USERNAME,
+    password: process.env.WATSON_PASSWORD,
     version: 'v1'
   });
-
+  console.log('wordssss: ', req.body.words)
   var params = {
     text: req.body.words,
     voice: 'en-US_MichaelVoice',
     accept: 'audio/wav'
   };
+  var pathToSound = path.join(__dirname, `../client/public/${req.body.id}.wav`)
   // Pipe the synthesized text to a file.
   var stream = text_to_speech.synthesize(params)
-  stream.pipe(fs.createWriteStream(path.join(__dirname, "../client/public/textToSpeech.wav")));
+  fs.closeSync(fs.openSync(pathToSound, 'w'));
+  stream.pipe(fs.createWriteStream(pathToSound));
   stream.on('end', function() {
     res.status(200).send({})
   })

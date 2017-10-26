@@ -19,14 +19,14 @@ export function fetchAllArticles(source) {
       })
 }
 
-export function fetchVoice(words) {
+export function fetchVoice(article) {
 	let obj = {
     method: "POST",
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({words: words})
+    body: JSON.stringify({words: article.description, id: article.id})
   }
 
-	return fetch('/textToSpeech', obj).then(() => {})
+	return fetch('/textToSpeech', obj)
 }
