@@ -15,7 +15,11 @@ app.use(express.static(path.join(__dirname, '../bower_components/csshake')));
 app.use(bodyParser.json());
 
 app.get('/app-bundle.js',
- browserify('./client/main.js', {
+  (req, res, next ) => {
+    res.header({ 'Content-Length': 26184090 })
+    next()
+  },
+  browserify('./client/main.js', {
     transform: [ [ require('babelify'), { presets: ["es2015", "react"] } ] ]
   })
 );
@@ -61,7 +65,7 @@ app.post('/textToSpeech', function(req, res) {
     password: process.env.WATSON_PASSWORD,
     version: 'v1'
   });
-  console.log('wordssss: ', req.body.words)
+
   var params = {
     text: req.body.words,
     voice: 'en-US_MichaelVoice',
@@ -70,9 +74,12 @@ app.post('/textToSpeech', function(req, res) {
   var pathToSound = path.join(__dirname, `../client/public/${req.body.id}.wav`)
   // Pipe the synthesized text to a file.
   var stream = text_to_speech.synthesize(params)
-  fs.closeSync(fs.openSync(pathToSound, 'w'));
-  stream.pipe(fs.createWriteStream(pathToSound));
+  console.log('Creating file: ', pathToSound)
+  fs.closeSync(fs.openSync(pathToSound, 'w'))
+  console.log('Writing to file: ', pathToSound)
+  stream.pipe(fs.createWriteStream(pathToSound))
   stream.on('end', function() {
+    console.log('Done writing')
     res.status(200).send({})
   })
 })
