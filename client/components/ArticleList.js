@@ -6,7 +6,6 @@ import { fetchAllArticles, fetchAllSources, fetchVoice } from '../models/article
 import UserControls from './UserControls.js';
 import Watson from 'watson-developer-cloud'
 import Sentiment from 'sentiment';
-import * as Logo from '../models/sourceLogo.js'
 import RC from 'rc-progress';
 
 var ProgressBar = RC.Line
@@ -158,8 +157,10 @@ export default class ArticleList extends React.Component {
     this.setState({articleTitle: title})
     fetchComments(title)
     .then(comments => {
-      this.setState({comments: comments})
-      this.setState({showComments: true});
+      this.setState({
+        comments: comments,
+        showComments: true
+      })
     })
   }
   updateComments(){
@@ -176,13 +177,11 @@ export default class ArticleList extends React.Component {
     var title = article.title.split(' ')
 
     article.id = [title[0], title[1]].join('')
-    console.log('the article: ', article)
     if(!waitingForSpeech){
       document.body.style.cursor = 'wait';
       waitingForSpeech = true;
       fetchVoice(article).then(something => {
-        var audio = new Audio(`${article.id}.wav`);
-        console.log('audio: ', audio)
+        var audio = new Audio(`soundcloud/${article.id}.wav`);
         audio.load();
         document.body.style.cursor = 'default';
         audio.play();

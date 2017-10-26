@@ -11,6 +11,7 @@ var Comments       = require('./comments')
 var app = express();
 
 app.use(express.static(path.join(__dirname, "../client/public")));
+app.use('/soundcloud', express.static(path.join(__dirname, "../soundcloud/")));
 app.use(express.static(path.join(__dirname, '../bower_components/csshake')));
 app.use(bodyParser.json());
 
@@ -71,7 +72,7 @@ app.post('/textToSpeech', function(req, res) {
     voice: 'en-US_MichaelVoice',
     accept: 'audio/wav'
   };
-  var pathToSound = path.join(__dirname, `../client/public/${req.body.id}.wav`)
+  var pathToSound = path.join(__dirname, `../soundcloud/${req.body.id}.wav`)
   // Pipe the synthesized text to a file.
   var stream = text_to_speech.synthesize(params)
   console.log('Creating file: ', pathToSound)
@@ -84,6 +85,9 @@ app.post('/textToSpeech', function(req, res) {
   })
 })
 
+app.get('/soundcloud/:speechId', function(req, res) {
+
+})
 var port = process.env.PORT || 4000;
 app.listen(port, function() {
   console.log("Listening on localhost:" + port);
