@@ -19,13 +19,24 @@ export function fetchAllArticles(source) {
       })
 }
 
+function validateText(description) {
+  return typeof description === 'string' ?
+        description.length > 1
+          ? description
+            : 'No description'
+        : 'No description'
+}
+
 export function fetchVoice(article) {
 	let obj = {
     method: "POST",
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({words: article.description, id: article.id})
+    body: JSON.stringify({
+      words: validateText(article.description),
+      id: article.id
+    })
   }
 
 	return fetch('/textToSpeech', obj)
