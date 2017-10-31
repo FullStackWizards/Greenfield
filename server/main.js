@@ -1,5 +1,6 @@
 "use strict"
 require('dotenv').config()
+process.env.NODE_ENV = process.env.mode || 'development'
 var express        = require('express');
 var path           = require('path');
 var browserify     = require('browserify-middleware');
@@ -7,6 +8,7 @@ var bodyParser     = require('body-parser');
 var watson = require('watson-developer-cloud');
 var fs             = require('fs');
 var Comments       = require('./comments')
+
 
 var app = express();
 
