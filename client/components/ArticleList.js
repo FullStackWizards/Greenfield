@@ -141,7 +141,6 @@ export default class ArticleList extends React.Component {
     fetchAllSources()
     .then(sources => {
       let filteredSources = [];
-      console.log(sources[0])
       sources.forEach(source => {
 
 
